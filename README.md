@@ -7,5 +7,5 @@ The folders are split up in the following ways: <br>
 4. DDPG_Codes:  Codes for all deep deterministic policy gradient applied to different examples
 5. PID:  Control problems using PID <br>
 
-Models:  All simulation models I've created.  There are SISO, MISO, SIMO, and MIMO models.  Compatible using scipy or CasaDI <br>
-Modules:  All the different modules I've created for reinforcement learning, MPC, and PID.
+**Models:**  All simulation models I've created.  There are SISO, MISO, SIMO, and MIMO models.  Compatible using scipy or CasaDI <br>
+**Modules:**  All the different modules I've created for reinforcement learning, MPC, and PID.
