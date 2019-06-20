@@ -580,7 +580,7 @@ if __name__ == '__main__':
     parser.add_argument('--summary-dir', help='directory for storing tensorboard info', default='./results/tf_ddpg')
     parser.add_argument('--ckpt-dir', help='directory for saved models', default='./results/checkpoints/a.ckpt')
 
-    parser.set_defaults(render_env=True)
+    parser.set_defaults(render_env=False)
     parser.set_defaults(use_gym_monitor=True)
 
     # Parse the args

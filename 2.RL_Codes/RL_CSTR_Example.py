@@ -28,7 +28,7 @@ def simulation():
     their own states and actions.  RL will automatically populate states and actions if user does not input their own.
     """
 
-    states = np.zeros([50])
+    states = np.zeros([37])
     states[0:10] = np.linspace(290, 310, 10)
     states[10:40] = np.linspace(310, 330, 30)
     states[40:50] = np.linspace(330, 350, 10)
