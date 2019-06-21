@@ -31,9 +31,10 @@ class ModelPredictiveControl:
         self.Nt = nt
         self.Nx = num_of_states
         self.Nu = num_of_inputs
-        self.Q = q * np.eye(num_of_states)
+        # self.Q = q * np.eye(int(num_of_states / 4))
+        self.Q = q * np.eye(2)
         self.R = r * np.eye(num_of_inputs)
-        self.P = p * np.eye(num_of_states)
+        self.P = p * np.eye(int(num_of_states / 4))
         self.ss_states = ss_states
         self.ss_inputs = ss_inputs
         self.eval_time = eval_time
@@ -54,7 +55,8 @@ class ModelPredictiveControl:
         # for the output disturbance modelling
 
         if self.dist is True:
-            self.Q = q * np.eye(int(num_of_states * 0.5))
+            # self.Q = q * np.eye(int(num_of_states * 0.5))
+            self.Q = q * np.eye(2)
             self.P = p * np.eye(int(num_of_states * 0.5))
         else:
             self.Q = q * np.eye(num_of_states)
@@ -77,6 +79,7 @@ class ModelPredictiveControl:
 
     def stage_loss(self, states, inputs, parameter):
 
+        # First part is actual state, 2nd part is offset free control
         dx = states[:int(self.Nx * 0.5)] + states[int(self.Nx * 0.5):self.Nx] - self.ss_states[:int(self.Nx*0.5)]
         du = inputs - self.ss_inputs
 
@@ -84,6 +87,24 @@ class ModelPredictiveControl:
         u_cost = mpc.mtimes(du.T, self.R, du)
 
         return (x_cost + u_cost)*self.gamma**parameter
+
+    """
+    Calculates the output loss
+    
+    """
+
+    def output_loss(self, states, inputs, parameter):
+
+        x = states[:int(self.Nx * 0.5)] + states[int(self.Nx * 0.5):self.Nx]
+        # y = np.array([(0.776 * x[0] - 0.9 * x[2]), (0.6055 * x[1] - 1.3472 * x[3])]) - np.array([100, 0])
+        y = np.array([(0.776 * x[0] - 0.9 * x[2]), ]) - np.array([100])
+
+        du = inputs - self.ss_inputs
+
+        y_cost = mpc.mtimes(y.T, self.Q, y)
+        u_cost = mpc.mtimes(du.T, self.R, du)
+
+        return (y_cost + u_cost)*self.gamma**parameter
 
     """
     Calculation for terminal cost
@@ -124,7 +145,7 @@ class ModelPredictiveControl:
         else:
             shape = self.parameter.shape[1]
 
-        loss = mpc.getCasadiFunc(self.stage_loss, [self.Nx, self.Nu, shape], ["x", "u", "p"], funcname="loss")
+        loss = mpc.getCasadiFunc(self.output_loss, [self.Nx, self.Nu, shape], ["x", "u", "p"], funcname="loss")
         # pf = mpc.getCasadiFunc(self.terminal_loss, [self.Nx], ["x"], funcname="pf")
 
         # Define where the function args should be.  More precisely, we must put p in the loss function.
