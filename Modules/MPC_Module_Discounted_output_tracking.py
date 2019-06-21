@@ -32,7 +32,7 @@ class ModelPredictiveControl:
         self.Nx = num_of_states
         self.Nu = num_of_inputs
         # self.Q = q * np.eye(int(num_of_states / 4))
-        self.Q = q * np.eye(2)
+        self.Q = q * np.eye(1)
         self.R = r * np.eye(num_of_inputs)
         self.P = p * np.eye(int(num_of_states / 4))
         self.ss_states = ss_states
@@ -56,7 +56,7 @@ class ModelPredictiveControl:
 
         if self.dist is True:
             # self.Q = q * np.eye(int(num_of_states * 0.5))
-            self.Q = q * np.eye(2)
+            self.Q = q * np.eye(1)
             self.P = p * np.eye(int(num_of_states * 0.5))
         else:
             self.Q = q * np.eye(num_of_states)
