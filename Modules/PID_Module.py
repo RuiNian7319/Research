@@ -9,7 +9,7 @@ def pid(set_point, x_cur, x_1, x_2, kp, ki, kd, u_1, error, ts):
 
     """
     Inputs
-    ----
+       ----
         set_point: Set-point of the controller
         x_cur: Current state
         x_1: State(t - 1)
@@ -27,7 +27,7 @@ def pid(set_point, x_cur, x_1, x_2, kp, ki, kd, u_1, error, ts):
     ek_2 = set_point - x_2
     error.append(ek)        # Add to the previous error
 
-    # ef = ek / (0.1*td + 1)
+    # ef = ek / (0.1 * td + 1)
 
     "Discrete Time PID, derivative part is not accurate.  Ef should be at (k - 1) and (k - 2),"
     "but we don't use the derivative part"
@@ -39,8 +39,3 @@ def pid(set_point, x_cur, x_1, x_2, kp, ki, kd, u_1, error, ts):
     u_cur = u_1 + du
 
     return u_cur
-
-
-if __name__ == "__main__":
-
-    pass

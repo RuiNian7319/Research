@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 import os
-sys.path.insert(0, '/home/rui/Documents/RL_vs_MPC/Models')
+sys.path.insert(0, '/home/rui/Documents/Research/Models')
 
 from CSTR_model import MimoCstr
 from MPC_Module import ModelPredictiveControl

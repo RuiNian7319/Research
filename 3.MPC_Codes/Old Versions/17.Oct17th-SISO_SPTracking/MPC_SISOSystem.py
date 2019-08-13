@@ -2,8 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 
-sys.path.insert(0, '/home/rui/Documents/RL_vs_MPC/Models')
-sys.path.insert(0, '/home/rui/Documents/RL_vs_MPC/Modules')
+sys.path.insert(0, '/home/rui/Documents/Research/Models')
+sys.path.insert(0, '/home/rui/Documents/Research/Modules')
 
 from copy import deepcopy
 from Linear_System_CasADI import LinearSystem

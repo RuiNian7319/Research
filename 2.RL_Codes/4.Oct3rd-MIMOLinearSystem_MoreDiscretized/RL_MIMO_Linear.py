@@ -90,8 +90,7 @@ def simulation():
             if t % rl.eval_period == 0:
                 state, action = rl.ucb_action_selection(model.x[t - 1, :])
                 action, action_index = rl.action_selection(state, action, model.u[t - 1, :], no_decay=25,
-                                                           ep_greedy=False, time=t,
-                                                           min_eps_rate=0.5)
+                                                           ep_greedy=True, time=t, min_eps_rate=0.5)
             else:
                 action = model.u[t - 1, :][0]
 

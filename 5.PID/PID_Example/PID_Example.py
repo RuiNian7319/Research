@@ -1,5 +1,6 @@
 import numpy as np
 import sys
+import matplotlib.pyplot as plt
 
 sys.path.insert(0, '/home/rui/Documents/RL_vs_MPC/Models')
 sys.path.insert(0, '/home/rui/Documents/RL_vs_MPC/Modules')
@@ -32,8 +33,8 @@ def simulation():
         if t < 5:
             inputs = np.array([1.])
         else:
-            # kp = 1.5, ki = 1.8
-            inputs = pid(model.xs, model.x[t - 1, :], model.x[t - 2, :], model.x[t - 2, :], kp=0.5, ki=1, kd=0,
+            # # kp = 1.5, ki = 1.8
+            inputs = pid(model.xs, model.x[t - 1, :], model.x[t - 2, :], model.x[t - 3, :], kp=0.5, ki=1, kd=0,
                          u_1=model.u[t - 1, :], error=error, ts=1)
 
         next_state, _, _, _ = model.step(inputs, t, obj_function="MPC")
@@ -46,3 +47,5 @@ def simulation():
 if __name__ == "__main__":
 
     env, Cost = simulation()
+    plt.plot(env.x)
+    plt.show()

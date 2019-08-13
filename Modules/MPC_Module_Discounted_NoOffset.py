@@ -77,7 +77,11 @@ class ModelPredictiveControl:
 
     def stage_loss(self, states, inputs, parameter):
 
-        dx = states[:int(self.Nx * 0.5)] + states[int(self.Nx * 0.5):self.Nx] - self.ss_states[:int(self.Nx*0.5)]
+        if self.dist:
+            dx = states[:int(self.Nx * 0.5)] + states[int(self.Nx * 0.5):self.Nx] - self.ss_states[:int(self.Nx*0.5)]
+        else:
+            dx = states[:int(self.Nx)] - self.ss_states[:int(self.Nx)]
+
         du = inputs - self.ss_inputs
 
         x_cost = mpc.mtimes(dx.T, self.Q, dx)
