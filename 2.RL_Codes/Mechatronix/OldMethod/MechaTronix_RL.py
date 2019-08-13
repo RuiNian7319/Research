@@ -15,7 +15,10 @@ Define reward function for RL.  User defines the reward function structure.  The
 
 # Model for MechaTronix
 def model(action):
-    return 0.0104 * np.square(action) + 0.183 * action - 4.558
+    """
+    Action: Total pump frequency (not delta pump frequency)
+    """
+    return 0.01158682 * np.square(action) + 0.02409036 * action - 2.073161
 
 
 # Reward function
@@ -38,7 +41,7 @@ def simulation():
     states = np.linspace(-2, 35, 38)
     rl.user_states(list(states))
 
-    actions = np.linspace(0, 60, 61)
+    actions = np.linspace(20, 60, 41)
     rl.user_actions(list(actions))
 
     # states = np.linspace(-10, 10, 21)
@@ -51,17 +54,17 @@ def simulation():
     Load pre-trained Q, T and NT matrices
     """
 
-    q = np.loadtxt("Q_Matrix.txt")
-    t = np.loadtxt("T_Matrix.txt")
-    nt = np.loadtxt("NT_Matrix.txt")
-
-    rl.user_matrices(q, t, nt)
+    # q = np.loadtxt("Q_Matrix.txt")
+    # t = np.loadtxt("T_Matrix.txt")
+    # nt = np.loadtxt("NT_Matrix.txt")
+    #
+    # rl.user_matrices(q, t, nt)
 
     """
     Simulation portion
     """
 
-    episodes = 1
+    episodes = 100
     num_sim = 2000
     rlist = []
 
@@ -69,7 +72,7 @@ def simulation():
 
         # Environment parameters
         states = np.zeros(num_sim + 1)
-        states[0] = 10
+        states[0] = 40
 
         error = np.zeros(num_sim + 1)
 
@@ -93,9 +96,9 @@ def simulation():
             #     cur_setpoint = 20
             # else:
             #     cur_setpoint = 15
-            #
-            # cur_setpoint = 10
-            #
+
+            cur_setpoint = 30
+
             # error[t] = states[t - 1] - cur_setpoint
 
             """
@@ -112,7 +115,7 @@ def simulation():
             if t % rl.eval_period == 0:
                 state, action = rl.ucb_action_selection(states[t - 1])
                 actions[t], action = rl.action_selection(state, action, 0, 25, ep_greedy=False, time=t,
-                                                         min_eps_rate=1.0)
+                                                         min_eps_rate=0.9)
             else:
                 actions[t] = actions[t - 1]
 
@@ -123,7 +126,7 @@ def simulation():
             """
 
             if t == rl.eval_feedback:
-                reward = reward_calc(states[t], 15)
+                reward = reward_calc(states[t], cur_setpoint)
                 rl.matrix_update(action, reward, state, states[t], 5)
                 tot_reward = tot_reward + reward
 
@@ -134,9 +137,9 @@ def simulation():
         if episode % 100 == 0:
             print('The current error is: {:2f}'.format(np.sum(np.square(states - 15))))
 
-        # Plotting
-        plt.plot(states)
-        plt.show()
+    # Plotting
+    plt.plot(states)
+    plt.show()
 
     return model, rl, rlist, states, actions
 
