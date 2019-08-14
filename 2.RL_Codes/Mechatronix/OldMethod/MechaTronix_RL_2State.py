@@ -147,7 +147,7 @@ def simulation():
         rl.autosave(episode, 250)
 
         if episode % 100 == 0:
-            print('The current error is: {:2f}'.format(np.sum(np.square(env_states - cur_setpoint))))
+            print('The current error is: {:2f}'.format(np.sqrt(np.sum(np.square(env_states - cur_setpoint)))))
 
     # Plotting
     plt.plot(env_states)
