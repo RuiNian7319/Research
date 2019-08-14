@@ -6,7 +6,7 @@ sys.path.insert(0, '/home/rui/Documents/RL_vs_MPC/Models')
 sys.path.insert(0, '/home/rui/Documents/RL_vs_MPC/RL_Codes')
 sys.path.insert(0, '/Users/ruinian/Documents/Research/2.RL_Codes')
 
-from RL_Module import *
+from RL_Module_Updated import *
 
 """
 Define reward function for RL.  User defines the reward function structure.  The below is an example.
@@ -31,53 +31,53 @@ def simulation():
     # Reinforcement Learning Initiation
     rl = ReinforceLearning(discount_factor=0.95, states_start=300, states_stop=340, states_interval=0.5,
                            actions_start=-15, actions_stop=15, actions_interval=2.5, learning_rate=0.5,
-                           epsilon=0.2, doe=1.2, eval_period=7)
+                           epsilon=0.2, doe=1.2, eval_period=5)
 
     """
     Example of user defined states and actions.  Users do not need to do this.  This is only if users want to define 
     their own states and actions.  RL will automatically populate states and actions if user does not input their own.
     """
 
-    states = np.linspace(-2, 35, 38)
-    rl.user_states(list(states))
-
-    actions = np.linspace(20, 60, 41)
-    rl.user_actions(list(actions))
-
-    # states = np.linspace(-10, 10, 21)
+    # states = np.linspace(-2, 35, 38)
     # rl.user_states(list(states))
     #
-    # actions = np.linspace(-10, 10, 21)
+    # actions = np.linspace(20, 60, 41)
     # rl.user_actions(list(actions))
+
+    states = np.linspace(-20, 20, 21)
+    rl.user_states(list(states))
+
+    actions = np.linspace(-10, 10, 21)
+    rl.user_actions(list(actions))
 
     """
     Load pre-trained Q, T and NT matrices
     """
 
-    # q = np.loadtxt("Q_Matrix.txt")
-    # t = np.loadtxt("T_Matrix.txt")
-    # nt = np.loadtxt("NT_Matrix.txt")
-    #
-    # rl.user_matrices(q, t, nt)
+    q = np.loadtxt("Q_Matrix.txt")
+    t = np.loadtxt("T_Matrix.txt")
+    nt = np.loadtxt("NT_Matrix.txt")
+
+    rl.user_matrices(q, t, nt)
 
     """
     Simulation portion
     """
 
-    episodes = 100
+    episodes = 301
     num_sim = 2000
     rlist = []
 
     for episode in range(episodes):
 
         # Environment parameters
-        states = np.zeros(num_sim + 1)
-        states[0] = 40
+        env_states = np.zeros(num_sim + 1)
+        env_states[0] = 40
 
         error = np.zeros(num_sim + 1)
 
-        actions = np.zeros(num_sim + 1)
-        actions[0] = 30
+        env_actions = np.zeros(num_sim + 1)
+        env_actions[0] = 60
 
         # Reset the model after each episode
         tot_reward = 0
@@ -92,14 +92,12 @@ def simulation():
             Set-point
             """
 
-            # if t % 1000 == 0:
-            #     cur_setpoint = 20
-            # else:
-            #     cur_setpoint = 15
+            if t > 1000:
+                cur_setpoint = np.random.uniform(30, 60)
+            else:
+                cur_setpoint = 30
 
-            cur_setpoint = 30
-
-            # error[t] = states[t - 1] - cur_setpoint
+            error[t] = env_states[t - 1] - cur_setpoint
 
             """
             Disturbance
@@ -113,21 +111,22 @@ def simulation():
             """
 
             if t % rl.eval_period == 0:
-                state, action = rl.ucb_action_selection(states[t - 1])
-                actions[t], action = rl.action_selection(state, action, 0, 25, ep_greedy=False, time=t,
-                                                         min_eps_rate=0.9)
+                # State: index of state; actions: Physical action; action: index of action
+                state, env_actions[t], action = rl.action_selection(error[t], env_actions[t - 1],
+                                                                    25, ep_greedy=True, time=t,
+                                                                    min_eps_rate=0.01)
             else:
-                actions[t] = actions[t - 1]
+                env_actions[t] = env_actions[t - 1]
 
-            states[t] = model(actions[t]) + np.random.uniform(-0.2, 0.2)
+            env_states[t] = model(env_actions[t])  # + np.random.uniform(-0.2, 0.2)
 
             """
             Feedback evaluation
             """
 
             if t == rl.eval_feedback:
-                reward = reward_calc(states[t], cur_setpoint)
-                rl.matrix_update(action, reward, state, states[t], 5)
+                reward = reward_calc(env_states[t], cur_setpoint)
+                rl.matrix_update(action, reward, state, error[t], 5)
                 tot_reward = tot_reward + reward
 
         rlist.append(tot_reward)
@@ -135,13 +134,14 @@ def simulation():
         rl.autosave(episode, 250)
 
         if episode % 100 == 0:
-            print('The current error is: {:2f}'.format(np.sum(np.square(states - 15))))
+            print('The current error is: {:2f}'.format(np.sum(np.square(env_states - cur_setpoint))))
 
     # Plotting
-    plt.plot(states)
+    plt.plot(env_states)
+    print(cur_setpoint)
     plt.show()
 
-    return model, rl, rlist, states, actions
+    return model, rl, rlist, env_states, env_actions
 
 
 # if __name__ == "__main__":
