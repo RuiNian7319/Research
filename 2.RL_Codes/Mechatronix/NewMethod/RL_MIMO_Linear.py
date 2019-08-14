@@ -53,11 +53,11 @@ def simulation():
     Load pre-trained Q, T and NT matrices
     """
 
-    q = np.loadtxt("Q_Matrix.txt")
-    t = np.loadtxt("T_Matrix.txt")
-    nt = np.loadtxt("NT_Matrix.txt")
-
-    rl.user_matrices(q, t, nt)
+    # q = np.loadtxt("Q_Matrix.txt")
+    # t = np.loadtxt("T_Matrix.txt")
+    # nt = np.loadtxt("NT_Matrix.txt")
+    #
+    # rl.user_matrices(q, t, nt)
 
     """
     Simulation portion
@@ -91,6 +91,9 @@ def simulation():
                 action, action_index = rl.action_selection(state, action, model.u[t - 1, :], no_decay=25,
                                                            ep_greedy=False, time=t,
                                                            min_eps_rate=0.5)
+                # Use interpolation to perform action
+                action = rl.interpolation(model.x[t - 1, 0])
+
             else:
                 action = model.u[t - 1, :][0]
 

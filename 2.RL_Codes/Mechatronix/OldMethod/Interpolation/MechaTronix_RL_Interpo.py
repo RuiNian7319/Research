@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 import sys
 sys.path.insert(0, '/home/rui/Documents/RL_vs_MPC/Models')
 sys.path.insert(0, '/home/rui/Documents/RL_vs_MPC/RL_Codes')
-sys.path.insert(0, '/Users/ruinian/Documents/Research/2.RL_Codes')
+sys.path.insert(0, '/Users/ruinian/Documents/Research/Modules')
+sys.path.insert(0, '/home/rui/Documents/Research/Modules')
 
 from RL_Module_Updated import *
 
@@ -38,12 +39,6 @@ def simulation():
     their own states and actions.  RL will automatically populate states and actions if user does not input their own.
     """
 
-    # states = np.linspace(-2, 35, 38)
-    # rl.user_states(list(states))
-    #
-    # actions = np.linspace(20, 60, 41)
-    # rl.user_actions(list(actions))
-
     states = np.linspace(-20, 20, 21)
     rl.user_states(list(states))
 
@@ -64,7 +59,7 @@ def simulation():
     Simulation portion
     """
 
-    episodes = 301
+    episodes = 1
     num_sim = 2000
     rlist = []
 
@@ -86,16 +81,16 @@ def simulation():
         state = 0
         action = 0
 
+        if episode % 22 == 0:
+            cur_setpoint = 35
+        else:
+            cur_setpoint = np.random.uniform(30, 60)
+
         for t in range(1, num_sim + 1):
 
             """
             Set-point
             """
-
-            if t > 1000:
-                cur_setpoint = np.random.uniform(30, 60)
-            else:
-                cur_setpoint = 30
 
             error[t] = env_states[t - 1] - cur_setpoint
 
@@ -113,8 +108,14 @@ def simulation():
             if t % rl.eval_period == 0:
                 # State: index of state; actions: Physical action; action: index of action
                 state, env_actions[t], action = rl.action_selection(error[t], env_actions[t - 1],
-                                                                    25, ep_greedy=True, time=t,
-                                                                    min_eps_rate=0.01)
+                                                                    25, ep_greedy=False, time=t,
+                                                                    min_eps_rate=0.9)
+
+                # Use interpolation to perform action
+                interpolated_action = rl.interpolation(error[t])
+
+                env_actions[t] = env_actions[t - 1] + interpolated_action
+
             else:
                 env_actions[t] = env_actions[t - 1]
 

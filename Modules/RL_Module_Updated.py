@@ -2,12 +2,16 @@
 Off-Policy model-free Q-learning with Upper Confidence Bound.
 
 Rui Nian
-Patch 1.02
+Patch 1.04
+
+Patch: Added Linear Interpolation
 """
 
 
 import numpy as np
 import random
+
+
 from copy import deepcopy
 
 
@@ -28,12 +32,15 @@ class ReinforceLearning:
     """
 
     def __init__(self, states_start, states_stop, states_interval, actions_start, actions_stop,
-                 actions_interval, learning_rate=0.7, epsilon=0.5, doe=1.2, discount_factor=0.95, eval_period=1):
+                 actions_interval, learning_rate=0.7, epsilon=0.5, doe=1.2, discount_factor=0.95, eval_period=1,
+                 random_seed=None):
 
         self.states = list(np.arange(states_start, states_stop, states_interval * 0.99))
         self.actions = list(np.arange(actions_start, actions_stop, actions_interval * 0.99))
+        self.learning_rate_0 = learning_rate
         self.learning_rate = learning_rate
         self.discount_factor = discount_factor
+        self.epsilon_0 = epsilon
         self.epsilon = epsilon
         self.doe = doe
         self.Q = np.zeros((len(self.states), len(self.actions)))
@@ -41,6 +48,18 @@ class ReinforceLearning:
         self.T = np.ones((len(self.states), len(self.actions)))
         self.eval_period = eval_period
         self.eval_feedback = 999
+
+        # State and action lists for multiple input multiple output systems
+        self.x1 = []
+        self.x2 = []
+
+        self.u1 = []
+        self.u2 = []
+
+        # Seed the results for reproducability
+        if random_seed is not None:
+            random.seed(random_seed)
+            np.random.seed(random_seed)
 
     """
     Random argmax
@@ -109,13 +128,26 @@ class ReinforceLearning:
 
     def state_detection(self, cur_state):
 
-        state = min(self.states, key=lambda x_current: abs(x_current - cur_state))
-        state = self.states.index(state)
+        if type(cur_state) == np.float64:
+
+            state = min(self.states, key=lambda x_current: abs(x_current - cur_state))
+            state = self.states.index(state)
+
+        else:
+
+            state1 = min(self.x1, key=lambda x: abs(x - cur_state[0]))
+            state2 = min(self.x2, key=lambda x: abs(x - cur_state[1]))
+
+            state = self.states.index([state1, state2])
 
         return state
 
     """
     Calculating the learning rate for Reinforcement Learning
+
+    The decay is extremely slow and can be shown as:
+    
+    e = e0 / 1 + (nt^(1/10) - 1), so it takes 970,299 visits to reach a eps value of 0.01 if e0 = 1
 
     no_decay: Number of visits to a state-action pair before decay occurs
     sa_pair: Number of times a state action pair was visited
@@ -127,7 +159,7 @@ class ReinforceLearning:
         if sa_pair < no_decay:
             pass
         else:
-            self.epsilon = self.epsilon / (1 + sa_pair)
+            self.epsilon = self.epsilon_0 / (1 + (sa_pair**(1/12) - 1))
 
         self.epsilon = max(self.epsilon, min_eps_rate)
 
@@ -202,7 +234,7 @@ class ReinforceLearning:
 
         # Decaying learning rate
         else:
-            self.learning_rate = self.learning_rate / (sa_pair - no_decay + 1)
+            self.learning_rate = self.learning_rate_0 / (sa_pair - no_decay + 1)
 
         self.learning_rate = max(self.learning_rate, min_learn_rate)
 
@@ -211,13 +243,13 @@ class ReinforceLearning:
     
     action: Index of the latest action
     rewards: Reward received from the latest state action pair
-    old_state: The state the system was in before the action was performed
-    new_state: The state the system is in after the action was performed
+    old_state: The index of the state the system was in before the action was performed
+    new_state: The index of the state the system is in after the action was performed
     no_decay: Amount of times state/action pair can be visited before decay in learning rate and epsilon occurs
-    min_learn_rate: Minimum value for learning rate.  Default value is 0.001
+    min_learn_rate: Minimum value for learning rate.  Default value is 0.0008
     """
 
-    def matrix_update(self, action, rewards, old_state, cur_state, no_decay, min_learn_rate=0.0001):
+    def matrix_update(self, action, rewards, old_state, cur_state, no_decay, min_learn_rate=0.0008):
 
         # State detection for new state
         new_state = self.state_detection(cur_state)
@@ -266,6 +298,12 @@ class ReinforceLearning:
             np.savetxt("T_Matrix.txt", self.T)
             np.savetxt("NT_Matrix.txt", self.NT)
 
+    """
+    Linear Interpolation to get "continuous" actions
+    
+    y = y0 + (x - x0) * (y1 - y0) / (x1 - x0)
+    """
+
     def interpolation(self, x):
         i = 0
 
@@ -290,9 +328,9 @@ class ReinforceLearning:
 
     """
     Weighted Linear Interpolation to use the Q-value information efficiently
-
+    
     y = y0 + (x - x0) * (ay1 - by0) / (x1 - x0)
-
+    
     a = eta * Q1 / Q0
     b = eta * Q0 / Q1
     """
