@@ -32,7 +32,7 @@ def simulation():
     # Reinforcement Learning Initiation
     rl = ReinforceLearning(discount_factor=0.95, states_start=300, states_stop=340, states_interval=0.5,
                            actions_start=-15, actions_stop=15, actions_interval=2.5, learning_rate=0.5,
-                           epsilon=0.2, doe=1.2, eval_period=5)
+                           epsilon=0.2, doe=1.2, eval_period=50)
 
     """
     Example of user defined states and actions.  Users do not need to do this.  This is only if users want to define 
