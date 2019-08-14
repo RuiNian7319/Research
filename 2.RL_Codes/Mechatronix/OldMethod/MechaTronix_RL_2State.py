@@ -124,7 +124,7 @@ def simulation():
                 env_actions[t] = env_actions[t - 1]
 
             # State evolution/trajectory
-            env_states[t, 0] = model(env_actions[t])  # + np.random.uniform(-0.2, 0.2)
+            env_states[t, 0] = model(env_actions[t]) + np.random.uniform(-0.1, 0.1)
 
             if env_states[t, 0] < 10:
                 env_states[t, 1] = 1
@@ -151,7 +151,16 @@ def simulation():
 
     # Plotting
     plt.plot(env_states)
-    print(cur_setpoint)
+    plt.xlabel('Pump RPM, (Hertz)')
+    plt.ylabel('Pressure, P')
+
+    plt.axhline(y=cur_setpoint, color='red')
+
+    plt.text(x=750, y=34.5, s='Set point')
+    plt.text(x=750, y=35.9, s='Pressure Trajectory')
+
+    plt.ylim([33, 43])
+
     plt.show()
 
     return model, rl, rlist, env_states, env_actions

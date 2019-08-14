@@ -119,7 +119,7 @@ def simulation():
             else:
                 env_actions[t] = env_actions[t - 1]
 
-            env_states[t] = model(env_actions[t])  # + np.random.uniform(-0.2, 0.2)
+            env_states[t] = model(env_actions[t]) + np.random.uniform(-0.1, 0.1)
 
             """
             Feedback evaluation
@@ -139,7 +139,16 @@ def simulation():
 
     # Plotting
     plt.plot(env_states)
-    print(cur_setpoint)
+    plt.xlabel('Pump RPM, (Hertz)')
+    plt.ylabel('Pressure, P')
+
+    plt.axhline(y=cur_setpoint, color='red')
+
+    plt.text(x=750, y=34.5, s='Set point')
+    plt.text(x=750, y=35.9, s='Pressure Trajectory')
+
+    plt.ylim([33, 43])
+
     plt.show()
 
     return model, rl, rlist, env_states, env_actions
