@@ -92,7 +92,7 @@ def simulation():
         if episode % 22 == 0:
             cur_setpoint = 35
         else:
-            cur_setpoint = np.random.uniform(0, 60)
+            cur_setpoint = 35  # np.random.uniform(0, 60)
 
         for t in range(1, num_sim + 1):
 
@@ -147,10 +147,10 @@ def simulation():
         rl.autosave(episode, 250)
 
         if episode % 100 == 0:
-            print('The current error is: {:2f}'.format(np.sqrt(np.sum(np.square(env_states - cur_setpoint)))))
+            print('The current error is: {:2f}'.format(np.sqrt(np.sum(np.square(env_states[:, 0] - cur_setpoint)))))
 
     # Plotting
-    plt.plot(env_states)
+    plt.plot(env_states[:, 0])
     plt.xlabel('Pump RPM, (Hertz)')
     plt.ylabel('Pressure, P')
 
