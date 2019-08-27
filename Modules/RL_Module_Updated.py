@@ -159,7 +159,7 @@ class ReinforceLearning:
         if sa_pair < no_decay:
             pass
         else:
-            self.epsilon = self.epsilon_0 / (1 + (sa_pair**(1/12) - 1))
+            self.epsilon -= 0.0000016
 
         self.epsilon = max(self.epsilon, min_eps_rate)
 
