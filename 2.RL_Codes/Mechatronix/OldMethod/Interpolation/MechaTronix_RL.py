@@ -32,7 +32,7 @@ def simulation():
     # Reinforcement Learning Initiation
     rl = ReinforceLearning(discount_factor=0.95, states_start=300, states_stop=340, states_interval=0.5,
                            actions_start=-15, actions_stop=15, actions_interval=2.5, learning_rate=0.5,
-                           epsilon=0.2, doe=1.2, eval_period=50)
+                           epsilon=0.2, doe=1.2, eval_period=5)
 
     """
     Example of user defined states and actions.  Users do not need to do this.  This is only if users want to define 
@@ -60,7 +60,7 @@ def simulation():
     """
 
     episodes = 1
-    num_sim = 2000
+    num_sim = 50
     rlist = []
 
     for episode in range(episodes):
@@ -81,7 +81,7 @@ def simulation():
         state = 0
         action = 0
 
-        if episode % 22 == 0:
+        if episode % 10 == 0:
             cur_setpoint = 35
         else:
             cur_setpoint = 35  # np.random.uniform(30, 60)
@@ -114,7 +114,7 @@ def simulation():
             else:
                 env_actions[t] = env_actions[t - 1]
 
-            env_states[t] = model(env_actions[t]) + np.random.uniform(-0.1, 0.1)
+            env_states[t] = model(env_actions[t]) + np.random.uniform(-0.15, 0.15)
 
             """
             Feedback evaluation

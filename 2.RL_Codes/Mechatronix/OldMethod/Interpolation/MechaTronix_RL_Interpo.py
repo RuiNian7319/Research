@@ -60,7 +60,7 @@ def simulation():
     """
 
     episodes = 1
-    num_sim = 2000
+    num_sim = 50
     rlist = []
 
     for episode in range(episodes):
