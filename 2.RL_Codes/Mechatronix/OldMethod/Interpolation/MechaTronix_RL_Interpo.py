@@ -138,6 +138,13 @@ def simulation():
             print('The current error is: {:2f}'.format(np.sqrt(np.sum(np.square(env_states - cur_setpoint)))))
 
     # Plotting
+    fonts = {"family": "serif",
+             "weight": "normal",
+             "size": "12"}
+
+    plt.rc('font', **fonts)
+    plt.rc('text', usetex=True)
+
     plt.plot(env_states)
     plt.xlabel('Pump RPM, (Hertz)')
     plt.ylabel('Pressure, P')
