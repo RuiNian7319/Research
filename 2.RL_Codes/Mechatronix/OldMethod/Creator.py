@@ -10,4 +10,11 @@ def splitter(values):
     for i in range(1, len(values)):
         states[6 * i + 1:6 * (i + 1)] = np.linspace(states[6 * i], states[6 * (i + 1)], 5) + np.random.normal(0, 0.05)
 
-    plt.plot(states[6:300])
+    output = np.array([states, np.linspace(-5, 301, 307)])
+
+    plt.plot(output[0, 6:300])
+    plt.show()
+
+    np.savetxt('set_1.csv', output[:, 6:300].T, delimiter=',')
+
+    return output

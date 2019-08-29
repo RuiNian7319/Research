@@ -75,12 +75,12 @@ def simulation():
 
         # Environment parameters
         env_states = np.zeros((num_sim + 1, 2))
-        env_states[0, :] = [40, 3]
+        env_states[0, :] = [10.5, 2]
 
         error = np.zeros(num_sim + 1)
 
         env_actions = np.zeros(num_sim + 1)
-        env_actions[0] = 60
+        env_actions[0] = 32
 
         # Reset the model after each episode
         tot_reward = 0
@@ -90,9 +90,9 @@ def simulation():
         action = 0
 
         if episode % 22 == 0:
-            cur_setpoint = 35
+            cur_setpoint = 5
         else:
-            cur_setpoint = 35  # np.random.uniform(0, 60)
+            cur_setpoint = 5  # np.random.uniform(0, 60)
 
         for t in range(1, num_sim + 1):
 
@@ -166,7 +166,7 @@ def simulation():
     plt.text(x=750, y=34.5, s='Set point')
     plt.text(x=750, y=35.9, s='Pressure Trajectory')
 
-    plt.ylim([33, 43])
+    # plt.ylim([33, 43])
 
     plt.show()
 

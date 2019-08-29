@@ -67,12 +67,12 @@ def simulation():
 
         # Environment parameters
         env_states = np.zeros(num_sim + 1)
-        env_states[0] = 10
+        env_states[0] = 41
 
         error = np.zeros(num_sim + 1)
 
         env_actions = np.zeros(num_sim + 1)
-        env_actions[0] = 42
+        env_actions[0] = 60
 
         # Reset the model after each episode
         tot_reward = 0
@@ -82,9 +82,9 @@ def simulation():
         action = 0
 
         if episode % 22 == 0:
-            cur_setpoint = 5
+            cur_setpoint = 35
         else:
-            cur_setpoint = 5  # np.random.uniform(30, 60)
+            cur_setpoint = 35  # np.random.uniform(30, 60)
 
         for t in range(1, num_sim + 1):
 
