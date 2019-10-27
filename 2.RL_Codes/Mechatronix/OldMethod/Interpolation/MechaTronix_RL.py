@@ -1,4 +1,3 @@
-import mpctools as mpc
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
@@ -23,8 +22,8 @@ def model(action):
 
 
 # Reward function
-def reward_calc(state, setpoint):
-    return max(-np.square(state - setpoint), -150)
+def reward_calc(state, action, setpoint):
+    return max(-np.square(state - setpoint) - action, -150)
 
 
 def simulation():
@@ -48,19 +47,19 @@ def simulation():
     """
     Load pre-trained Q, T and NT matrices
     """
-
-    q = np.loadtxt("Q_Matrix.txt")
-    t = np.loadtxt("T_Matrix.txt")
-    nt = np.loadtxt("NT_Matrix.txt")
-
-    rl.user_matrices(q, t, nt)
+    #
+    # q = np.loadtxt("Q_Matrix.txt")
+    # t = np.loadtxt("T_Matrix.txt")
+    # nt = np.loadtxt("NT_Matrix.txt")
+    #
+    # rl.user_matrices(q, t, nt)
 
     """
     Simulation portion
     """
 
-    episodes = 1
-    num_sim = 50
+    episodes = 1000
+    num_sim = 2000
     rlist = []
 
     for episode in range(episodes):
@@ -82,9 +81,9 @@ def simulation():
         action = 0
 
         if episode % 10 == 0:
-            cur_setpoint = 5
+            cur_setpoint = 35
         else:
-            cur_setpoint = 5  # np.random.uniform(30, 60)
+            cur_setpoint = np.random.uniform(30, 60)
 
         for t in range(1, num_sim + 1):
 
@@ -108,8 +107,8 @@ def simulation():
             if t % rl.eval_period == 0:
                 # State: index of state; actions: Physical action; action: index of action
                 state, env_actions[t], action = rl.action_selection(error[t], env_actions[t - 1],
-                                                                    25, ep_greedy=False, time=t,
-                                                                    min_eps_rate=0.9)
+                                                                    25, ep_greedy=True, time=t,
+                                                                    min_eps_rate=0.1)
 
             else:
                 env_actions[t] = env_actions[t - 1]
@@ -121,7 +120,7 @@ def simulation():
             """
 
             if t == rl.eval_feedback:
-                reward = reward_calc(env_states[t], cur_setpoint)
+                reward = reward_calc(env_states[t], env_actions[t] - env_actions[t - 1], cur_setpoint)
                 rl.matrix_update(action, reward, state, error[t], 5)
                 tot_reward = tot_reward + reward
 

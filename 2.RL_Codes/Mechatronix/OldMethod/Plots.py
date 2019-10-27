@@ -125,6 +125,6 @@ plt.ylabel(r'Pressure, \textit{P} (kPa)')
 
 plt.xlim([0, 300])
 
-plt.savefig('5SP_interpolation.pdf', dpi=800, format='pdf')
+plt.savefig('5SP_interpolation.eps', dpi=800, format='eps')
 
 plt.show()

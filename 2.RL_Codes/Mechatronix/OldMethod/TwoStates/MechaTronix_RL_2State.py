@@ -68,7 +68,7 @@ def simulation():
     """
 
     episodes = 1
-    num_sim = 50
+    num_sim = 100
     rlist = []
 
     for episode in range(episodes):
@@ -90,9 +90,9 @@ def simulation():
         action = 0
 
         if episode % 22 == 0:
-            cur_setpoint = 5
+            cur_setpoint = 25     # np.random.uniform(0, 60)
         else:
-            cur_setpoint = 5  # np.random.uniform(0, 60)
+            cur_setpoint = 25     # np.random.uniform(0, 60)
 
         for t in range(1, num_sim + 1):
 
@@ -124,7 +124,7 @@ def simulation():
                 env_actions[t] = env_actions[t - 1]
 
             # State evolution/trajectory
-            env_states[t, 0] = model(env_actions[t]) + np.random.uniform(-0.1, 0.1)
+            env_states[t, 0] = model(env_actions[t])  # + np.random.uniform(-0.1, 0.1)
 
             if env_states[t, 0] < 10:
                 env_states[t, 1] = 1
@@ -144,7 +144,7 @@ def simulation():
 
         rlist.append(tot_reward)
 
-        rl.autosave(episode, 250)
+        rl.autosave(episode, 5)
 
         if episode % 100 == 0:
             print('The current error is: {:2f}'.format(np.sqrt(np.sum(np.square(env_states[:, 0] - cur_setpoint)))))
